@@ -1,0 +1,40 @@
+version: "3"
+services:
+    web:
+        build: .
+        container_name: docker-web
+        environment:
+            DB_CONNECTION: pgsql
+            DB_HOST: docker-db
+            DB_PORT: 5432
+            DB_DATABASE: postgres
+            DB_USERNAME: postgres
+            DB_PASSWORD: example
+        ports:
+            - 4000:80
+        volumes:
+            - ./laravel:/var/www/html
+        depends_on:
+            - "db"
+    db:
+        container_name: docker-db
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: example
+        ports:
+            - 5432:5432
+        deploy:
+            replicas: 5
+            restart_policy:
+                condition: on-failure
+    redis:
+        container_name: docker-redis
+        image: redis
+        restart: always
+        ports:
+            - 6379:6379
+        deploy:
+            replicas: 5
+            restart_policy:
+                condition: on-failure
